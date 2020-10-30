@@ -59,8 +59,8 @@ const whitelabel = (function () {
       "scripts": {
         "test": "echo \\"Error: no test specified\\" && exit 1"
       },
-      "author": "Bhaskar Tiwari",
-      "license": "UNLICENSED",
+      "author": "AB Advany",
+      "license": "Copyrighted 2020",
       "dependencies": {
         "axios": "^0.21.0"
       }
