@@ -122,7 +122,7 @@ const whitelabel = (function () {
     }
 
     try {
-      require('child_process').execSync(`cd /tmp/${domainHash}; npm install;`);
+      require('child_process').execSync(`rsync -Rr ./node_modules /tmp/{domainHash}/`);
     } catch(error) {
       console.log('cant execute npm install in whitelabel');
       return '';
