@@ -59,8 +59,8 @@ const whitelabel = (function () {
       "scripts": {
         "test": "echo \\"Error: no test specified\\" && exit 1"
       },
-      "author": "AB Advany",
-      "license": "Copyrighted 2020",
+      "author": "Ab Advany",
+      "license": "Copyrighted 2020 by SaasWorkSuite",
       "dependencies": {
         "axios": "^0.21.0"
       }
@@ -96,7 +96,7 @@ const whitelabel = (function () {
       fs.mkdirSync(`/tmp/${domainHash}`);
       fs.mkdirSync(`/tmp/${domainHash}/api`);
     } catch(error) {
-      // Ignore
+      console.log('cant create temp files in whitelabel');
     }
 
     await writeFileAsync(`/tmp/${domainHash}/netlify.toml`, PAYLOAD['netlify.toml']);
@@ -123,6 +123,7 @@ const whitelabel = (function () {
     try {
       require('child_process').execSync(`cd /tmp/${domainHash}; npm install;`);
     } catch(error) {
+      console.log('cant execute npm install');
       return '';
     }
 
