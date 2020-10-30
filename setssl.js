@@ -41,12 +41,14 @@ const setssl = (function () {
     try {
       listSites = await netlifyClient.listSites();
     } catch (error) {
-      return '';
+      console.log('no site found in setssl');
+      return 'no site found in setssl';
     }
 
     const site = listSites.find(site => site.name === domainHash);
     if(!site) {
-      return '';
+      console.log('no site found in setssl');
+      return 'no site found in setssl';
     }
 
     try {
@@ -54,9 +56,10 @@ const setssl = (function () {
         site_id: site.id
       });
       
-      return tsl;
+      return tsl.state;
     } catch (error) {
-      return '';
+      console.log('error in setssl');
+      return 'error in setssl';
     }
   };
 
