@@ -1,36 +1,6 @@
-const API_TOKEN = 'VOuT4dJrmvR8j7wp-0AABytmalJ39dtnBqLILez_Kz4';
+function(properties, context) {
 
-exports.handler = async (event) => {
-  const response = {
-    statusCode: 200,
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: ''
-  };
-
-  if (!event.httpMethod === 'GET') {
-    response.statusCode = '405';
-    return response;
-  };
-
-  if (!event.queryStringParameters.domain || !event.queryStringParameters.customDomain) {
-    response.statusCode = 400;
-    return response;
-  }
-
-  const domain = event.queryStringParameters.domain.trim();
-  const customDomain = event.queryStringParameters.customDomain.trim();
-  const path = event.queryStringParameters.path ? event.queryStringParameters.path.trim() : '';
-
-  response.body = await whitelabel(API_TOKEN, domain, path, customDomain);
-
-  response.body = JSON.stringify(response.body);
-
-  return response;
-};
-
-const whitelabel = (function () {
+  const whitelabel = (function () {
   const ERRORS = {
     DOMAIN_EXISTS: 'DOMAIN_EXISTS',
     BUILD_FAIL: 'BUILD_FAIL',
@@ -96,7 +66,7 @@ const whitelabel = (function () {
       fs.mkdirSync(`/tmp/${domainHash}`);
       fs.mkdirSync(`/tmp/${domainHash}/api`);
     } catch(error) {
-      console.log('cant create temp files in whitelabel');
+      console.log('cant create temp files in whitelabel ' + error);
     }
 
     await writeFileAsync(`/tmp/${domainHash}/netlify.toml`, PAYLOAD['netlify.toml']);
@@ -104,11 +74,14 @@ const whitelabel = (function () {
     
     const proxyContent = PAYLOAD['api/proxy.js']
       .replace('%DOMAIN_ROOT%', domain)
-      .replace('%PATH%', path);
+      .replace('%PATH%', path || '');
 
     await writeFileAsync(`/tmp/${domainHash}/api/proxy.js`, proxyContent);
+      
+    console.log(proxyContent);
 
     try {
+      console.log('execute createsite whitelabel');
       createSite = await netlifyClient.createSite({
         body: {
           id: domainHash,
@@ -122,13 +95,15 @@ const whitelabel = (function () {
     }
 
     try {
-      require('child_process').execSync(`rsync -Rr ./node_modules /tmp/{domainHash}/`);
+      console.log('execute copy files whitelabel');
+      require('child_process').execSync(`cp -r ./node_modules /tmp/${domainHash}/`, {stdio: 'inherit'});
     } catch(error) {
-      console.log('cant execute npm install in whitelabel');
+      console.log('cant execute npm install in whitelabel ' + error);
       return '';
     }
 
     try {
+      console.log('execute deploy whitelabel');
       const deploy = await netlifyClient.deploy(createSite.site_id, `/tmp/${domainHash}`, {
         fnDir: `/tmp/${domainHash}/api`,
         configPath: `/tmp/${domainHash}` + '/netlify.toml'
@@ -136,10 +111,21 @@ const whitelabel = (function () {
 
       return `https://${createSite.name}.netlify.app`;
     } catch (error) {
-      console.log('cant deploy in whitelabel');
+      console.log('cant deploy in whitelabel ' + error);
       return '';
     }
   };
 
   return whitelabel;
 })();
+    
+    return context.async( async callback => {
+        try {
+           return await whitelabel(context.keys.api, properties.bubble_domain, properties.path, properties.domain_to_whitelabel);
+        }
+        catch ( err ) {
+            callback( err );
+        }
+    });
+    
+}
