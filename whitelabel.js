@@ -117,13 +117,14 @@ const whitelabel = (function () {
         }
       });
     } catch (error) {
+      console.log('site already exists in whitelabel');
       return `https://${domainHash}.netlify.app`;
     }
 
     try {
       require('child_process').execSync(`cd /tmp/${domainHash}; npm install;`);
     } catch(error) {
-      console.log('cant execute npm install');
+      console.log('cant execute npm install in whitelabel');
       return '';
     }
 
@@ -135,7 +136,7 @@ const whitelabel = (function () {
 
       return `https://${createSite.name}.netlify.app`;
     } catch (error) {
-
+      console.log('cant deploy in whitelabel');
       return '';
     }
   };
