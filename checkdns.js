@@ -42,11 +42,13 @@ const checkdns = (function () {
     try {
       listSites = await netlifyClient.listSites();
     } catch (error) {
+      console.log('no site found in checkdns');
       return '';
     }
 
     const site = listSites.find(site => site.name === domainHash);
     if(!site) {
+      console.log('no site found in checkdns');
       return '';
     }
 
@@ -59,6 +61,7 @@ const checkdns = (function () {
 
     return verifyResult.data;
     } catch(error) {
+      console.log('error in checkdns');
       return '';
     }
     
