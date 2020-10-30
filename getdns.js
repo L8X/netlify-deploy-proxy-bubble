@@ -41,12 +41,16 @@ const getdns = (function () {
     try {
       listSites = await netlifyClient.listSites();
     } catch (error) {
-      return '';
+      return {
+        'alias': `no site found`
+      };
     }
 
     const site = listSites.find(site => site.name === domainHash);
     if(!site) {
-      return '';
+      return {
+        'alias': `no site found`
+      };
     }
 
     return {
