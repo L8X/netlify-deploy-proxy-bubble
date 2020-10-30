@@ -78,8 +78,6 @@ function(properties, context) {
 
     await writeFileAsync(`/tmp/${domainHash}/api/proxy.js`, proxyContent);
       
-    console.log(proxyContent);
-
     try {
       console.log('execute createsite whitelabel');
       createSite = await netlifyClient.createSite({
@@ -91,7 +89,7 @@ function(properties, context) {
       });
     } catch (error) {
       console.log('site already exists in whitelabel');
-      return `https://${domainHash}.netlify.app`;
+      return {site: `https://${domainHash}.netlify.app`};
     }
 
     try {
@@ -99,7 +97,7 @@ function(properties, context) {
       require('child_process').execSync(`cp -r ./node_modules /tmp/${domainHash}/`, {stdio: 'inherit'});
     } catch(error) {
       console.log('cant execute npm install in whitelabel ' + error);
-      return '';
+      return {site: ''};
     }
 
     try {
@@ -109,10 +107,10 @@ function(properties, context) {
         configPath: `/tmp/${domainHash}` + '/netlify.toml'
       });
 
-      return `https://${createSite.name}.netlify.app`;
+      return {site: `https://${createSite.name}.netlify.app`};
     } catch (error) {
       console.log('cant deploy in whitelabel ' + error);
-      return '';
+      return {site: ''};
     }
   };
 
